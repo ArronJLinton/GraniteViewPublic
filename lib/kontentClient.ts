@@ -147,7 +147,11 @@ export const getProductItemsWithSlugs = async (config: ClientConfig) =>
     .collections([siteCodename, "default"])
     .elementsParameter([contentTypes.product.elements.slug.codename])
     .toAllPromise()
-    .then((res) => res.data.items);
+    .then((res) => res.data.items)
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return [];
+    });
 
 export const getProductDetail = async (config: ClientConfig, slug: string, usePreview: boolean) =>
   getDeliveryClient(config)
@@ -167,7 +171,11 @@ export const getSolutionsWithSlugs = async (config: ClientConfig) =>
     .collections([siteCodename, "default"])
     .elementsParameter([contentTypes.solution.elements.slug.codename])
     .toAllPromise()
-    .then((res) => res.data.items);
+    .then((res) => res.data.items)
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return [];
+    });
 
 export const getSolutionDetail = async (config: ClientConfig, slug: string, usePreview: boolean) =>
   getDeliveryClient(config)
@@ -238,7 +246,14 @@ export const getAllArticles = async (config: ClientConfig, usePreview: boolean) 
       usePreviewMode: usePreview,
     })
     .toPromise()
-    .then((res) => res.data);
+    .then((res) => res.data)
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return {
+        items: [],
+        pagination: { skip: 0, limit: 0, count: 0, nextPage: "", totalCount: 0 },
+      };
+    });
 
 export const getArticleBySlug = async (config: ClientConfig, slug: string, usePreview: boolean) =>
   getDeliveryClient(config)
@@ -283,7 +298,13 @@ export const getItemsTotalCount = async (
 ) => {
   const query = getItemsCountByTypeQuery(config, usePreview, contentTypeCodename);
 
-  return await query.toPromise().then((res) => res.data.pagination.totalCount);
+  return await query
+    .toPromise()
+    .then((res) => res.data.pagination.totalCount)
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return 0;
+    });
 };
 
 export const getArticlesCountByCategory = async (
@@ -297,7 +318,13 @@ export const getArticlesCountByCategory = async (
     query.containsFilter(`elements.${contentTypes.article.elements.type.codename}`, [articleType]);
   }
 
-  return await query.toPromise().then((res) => res.data.pagination.totalCount ?? 0);
+  return await query
+    .toPromise()
+    .then((res) => res.data.pagination.totalCount ?? 0)
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return 0;
+    });
 };
 
 export const getProductTaxonomy = async (config: ClientConfig, usePreview: boolean) =>
@@ -324,12 +351,10 @@ export const getDefaultMetadata = async (config: ClientConfig, usePreview: boole
     )
     .depthParameter(defaultDepth)
     .toPromise()
-    .then((res) => {
-      const data = res.data.items[0];
-      if (!data) {
-        throw new Error("Default metadata not found.");
-      }
-      return data;
+    .then((res) => res.data.items[0])
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return undefined;
     });
 
 export const getItemBySlug = async <T extends IContentItem>(
@@ -376,7 +401,11 @@ export const getPagesSlugs = async (config: ClientConfig) =>
     .collections([siteCodename, "default"])
     .elementsParameter([contentTypes.page.elements.slug.codename])
     .toAllPromise()
-    .then((res) => res.data.items.map((item) => item.elements.slug.value));
+    .then((res) => res.data.items.map((item) => item.elements.slug.value))
+    .catch((error) => {
+      logDeliveryFailure(error);
+      return [];
+    });
 
 export const getItemsByCodenames = async (
   config: ClientConfig,
