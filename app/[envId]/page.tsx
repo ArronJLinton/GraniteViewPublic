@@ -5,11 +5,11 @@ import GraniteHomepage from "../../components/graniteView/GraniteHomepage.tsx";
 import PreviewGraniteHomepage from "../../components/graniteView/PreviewGraniteHomepage.tsx";
 import { previewApiKeyCookieName } from "../../lib/constants/cookies.ts";
 import { graniteMetadata } from "../../lib/constants/graniteView.ts";
-import { getHomepageNotices } from "../../lib/kontentClient.ts";
+import { getHomepageItems } from "../../lib/kontentClient.ts";
 import { parseFlatted, stringifyAsType } from "../../lib/utils/circularityUtils.ts";
 
-const getNotices = cache(async (envId: string, previewApiKey?: string) =>
-  getHomepageNotices({ envId, previewApiKey }, !!previewApiKey),
+const getItems = cache(async (envId: string, previewApiKey?: string) =>
+  getHomepageItems({ envId, previewApiKey }, !!previewApiKey),
 );
 
 const Home = async ({ params }: { params: Promise<{ envId: string }> }) => {
@@ -18,17 +18,12 @@ const Home = async ({ params }: { params: Promise<{ envId: string }> }) => {
   const previewApiKey = draft.isEnabled
     ? (await cookies()).get(previewApiKeyCookieName)?.value
     : undefined;
-  const noticeData = await getNotices(envId, previewApiKey);
-  console.log(
-    `Homepage notices envId=${envId} count=${noticeData.length} types=${noticeData
-      .map((item) => item.system.type)
-      .join(",")}`,
-  );
-  const notices = parseFlatted(stringifyAsType(noticeData));
+  const itemData = await getItems(envId, previewApiKey);
+  const items = parseFlatted(stringifyAsType(itemData));
 
   const HomepageComponent = draft.isEnabled ? PreviewGraniteHomepage : GraniteHomepage;
 
-  return <HomepageComponent notices={notices} />;
+  return <HomepageComponent items={items} />;
 };
 
 export function generateMetadata(): Metadata {

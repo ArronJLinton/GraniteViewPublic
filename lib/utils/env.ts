@@ -16,7 +16,7 @@ if (!NEXT_PUBLIC_KONTENT_ENVIRONMENT_ID) {
 
 export const siteCodename = isValidCollectionCodename(NEXT_PUBLIC_KONTENT_COLLECTION_CODENAME)
   ? NEXT_PUBLIC_KONTENT_COLLECTION_CODENAME
-  : "ficto_healthtech";
+  : "marketing";
 
 export const defaultEnvId = NEXT_PUBLIC_KONTENT_ENVIRONMENT_ID;
 

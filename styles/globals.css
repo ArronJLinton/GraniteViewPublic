@@ -18,34 +18,17 @@
     --color-granite-line: #e6e8eb;
 }
 
-[data-theme="ficto_healthtech"] {
-    --mainBackgroundColor: var(--color-emerald-950);
-    --mainHoverColor: var(--color-emerald-500);
-    --mainButtonColor: var(--color-emerald-800);
-    --mainBorderColor: var(--color-emerald-800);
-    --mainTextColor: var(--color-emerald-700);
-    --mainAfterColor: var(--color-emerald-900);
-    --mainAnchorColor: var(--color-emerald-800);
-}
-
-[data-theme="ficto_imaging"] {
-    --mainBackgroundColor: var(--color-indigo-950);
-    --mainHoverColor: var(--color-indigo-500);
-    --mainButtonColor: var(--color-indigo-800);
-    --mainBorderColor: var(--color-indigo-800);
-    --mainTextColor: var(--color-indigo-700);
-    --mainAfterColor: var(--color-indigo-900);
-    --mainAnchorColor: var(--color-indigo-800);
-}
-
-[data-theme="ficto_surgical"] {
-    --mainBackgroundColor: var(--color-rose-950);
-    --mainHoverColor: var(--color-rose-500);
-    --mainButtonColor: var(--color-rose-800);
-    --mainBorderColor: var(--color-rose-800);
-    --mainTextColor: var(--color-rose-700);
-    --mainAfterColor: var(--color-rose-900);
-    --mainAnchorColor: var(--color-rose-800);
+[data-theme="marketing"],
+[data-theme="client_advisory"],
+[data-theme="trading___markets"],
+[data-theme="risk_management"] {
+    --mainBackgroundColor: var(--color-granite-navy);
+    --mainHoverColor: var(--color-granite-gold-hover);
+    --mainButtonColor: var(--color-granite-gold);
+    --mainBorderColor: var(--color-granite-gold);
+    --mainTextColor: var(--color-granite-navy);
+    --mainAfterColor: var(--color-granite-navy);
+    --mainAnchorColor: var(--color-granite-gold);
 }
 
 @layer base {

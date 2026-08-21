@@ -39,9 +39,11 @@ export type ContentTypeCodenames =
  * Type representing all collections
  */
 export type CollectionCodenames =
-  | "ficto_healthtech"
-  | "ficto_imaging"
-  | "ficto_surgical"
+  | "marketing"
+  | "client_advisory"
+  | "trading___markets"
+  | "risk_management"
+  | "compliance"
   | "default";
 
 /**

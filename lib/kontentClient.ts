@@ -10,22 +10,17 @@ import type {
 import { contentTypeSnippets, contentTypes } from "../models/environment/index.ts";
 import { ArticlePageSize, ProductsPageSize } from "./constants/paging.ts";
 import {
-  complianceContentTypes,
-  complianceElements,
-  type FeaturedNotice,
-  type RegulatoryNotice,
-  type RiskAlert,
-} from "./types/compliance.ts";
+  type HomepageItem,
+  homepageElements,
+  homepageTypeCodenames,
+} from "./types/homepageContent.ts";
+import { publicCollectionCodenames } from "./types/perCollection.ts";
 import type { ArticleTypeWithAll } from "./utils/articlesListing.ts";
-import {
-  defaultEnvId,
-  deliveryApiDomain,
-  deliveryPreviewApiDomain,
-  siteCodename,
-} from "./utils/env.ts";
+import { defaultEnvId, deliveryApiDomain, deliveryPreviewApiDomain } from "./utils/env.ts";
 
 const sourceTrackingHeaderName = "X-KC-SOURCE";
 const defaultDepth = 10;
+const publicCollections = [...publicCollectionCodenames];
 
 const getDeliveryClient = ({ envId, previewApiKey }: ClientConfig) =>
   createDeliveryClient({
@@ -92,7 +87,7 @@ export const getHomepage = async (config: ClientConfig, usePreview: boolean) =>
   getDeliveryClient(config)
     .items()
     .type(contentTypes.website_root.codename)
-    .collection(siteCodename)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -115,7 +110,7 @@ export const getProductsForListing = async (
   const query = getDeliveryClient(config)
     .items<Product>()
     .type(contentTypes.product.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .elementsParameter([
       contentTypes.product.elements.product_base__name.codename,
       contentTypes.product.elements.product_base__main_image.codename,
@@ -144,7 +139,7 @@ export const getProductItemsWithSlugs = async (config: ClientConfig) =>
   getDeliveryClient(config)
     .items<Product>()
     .type(contentTypes.product.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .elementsParameter([contentTypes.product.elements.slug.codename])
     .toAllPromise()
     .then((res) => res.data.items)
@@ -157,6 +152,7 @@ export const getProductDetail = async (config: ClientConfig, slug: string, usePr
   getDeliveryClient(config)
     .items<Product>()
     .equalsFilter(`elements.${contentTypes.product.elements.slug.codename}`, slug)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -168,7 +164,7 @@ export const getSolutionsWithSlugs = async (config: ClientConfig) =>
   getDeliveryClient(config)
     .items<Solution>()
     .type(contentTypes.solution.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .elementsParameter([contentTypes.solution.elements.slug.codename])
     .toAllPromise()
     .then((res) => res.data.items)
@@ -181,6 +177,7 @@ export const getSolutionDetail = async (config: ClientConfig, slug: string, useP
   getDeliveryClient(config)
     .items<Solution>()
     .equalsFilter(`elements.${contentTypes.solution.elements.slug.codename}`, slug)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -192,7 +189,7 @@ export const getSiteMenu = async (config: ClientConfig, usePreview: boolean) => 
   return await getDeliveryClient(config)
     .items<LP_WebsiteRoot>()
     .type(contentTypes.website_root.codename)
-    .collection(siteCodename)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -217,7 +214,7 @@ export const getArticlesForListing = async (
   const query = getDeliveryClient(config)
     .items<Article>()
     .type(contentTypes.article.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .orderByDescending(`elements.${contentTypes.article.elements.publishing_date.codename}`)
     .queryConfig({
       usePreviewMode: usePreview,
@@ -241,7 +238,7 @@ export const getAllArticles = async (config: ClientConfig, usePreview: boolean) 
   getDeliveryClient(config)
     .items<Article>()
     .type(contentTypes.article.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
     })
@@ -259,6 +256,7 @@ export const getArticleBySlug = async (config: ClientConfig, slug: string, usePr
   getDeliveryClient(config)
     .items<Article>()
     .equalsFilter(`elements.${contentTypes.article.elements.slug.codename}`, slug)
+    .collections(publicCollections)
     .depthParameter(defaultDepth)
     .queryConfig({
       usePreviewMode: usePreview,
@@ -270,7 +268,7 @@ export const getArticleBySlug = async (config: ClientConfig, slug: string, usePr
 const getCurrentCollectionTotalCountQuery = (config: ClientConfig) =>
   getDeliveryClient(config)
     .items()
-    .collection(siteCodename)
+    .collections(publicCollections)
     .elementsParameter([])
     .limitParameter(1)
     .includeTotalCountParameter();
@@ -280,7 +278,7 @@ const getItemsCountByTypeQuery = (
   usePreview: boolean,
   contentTypeCodename?: string,
 ) => {
-  const query = getCurrentCollectionTotalCountQuery(config).collection(siteCodename).queryConfig({
+  const query = getCurrentCollectionTotalCountQuery(config).queryConfig({
     usePreviewMode: usePreview,
     waitForLoadingNewContent: usePreview,
   });
@@ -341,7 +339,7 @@ export const getDefaultMetadata = async (config: ClientConfig, usePreview: boole
   getDeliveryClient(config)
     .items<LP_WebsiteRoot>()
     .type(contentTypes.website_root.codename)
-    .collection(siteCodename)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -367,7 +365,7 @@ export const getItemBySlug = async <T extends IContentItem>(
     .items<T>()
     .equalsFilter("elements.slug", slug)
     .type(type)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -398,7 +396,7 @@ export const getPagesSlugs = async (config: ClientConfig) =>
   getDeliveryClient(config)
     .items<LP_Page>()
     .type(contentTypes.page.codename)
-    .collections([siteCodename, "default"])
+    .collections(publicCollections)
     .elementsParameter([contentTypes.page.elements.slug.codename])
     .toAllPromise()
     .then((res) => res.data.items.map((item) => item.elements.slug.value))
@@ -415,6 +413,7 @@ export const getItemsByCodenames = async (
   getDeliveryClient(config)
     .items()
     .inFilter("system.codename", codenames)
+    .collections(publicCollections)
     .queryConfig({
       usePreviewMode: usePreview,
       waitForLoadingNewContent: usePreview,
@@ -437,7 +436,8 @@ const getItemsByType = async <ItemType extends IContentItem>(
     const ordered = await client
       .items<ItemType>()
       .type(typeCodename)
-      .orderByDescending(`elements.${complianceElements.effectiveDate}`)
+      .collections(publicCollections)
+      .orderByDescending(`elements.${homepageElements.effectiveDate}`)
       .queryConfig(queryConfig)
       .toPromise();
 
@@ -450,6 +450,7 @@ const getItemsByType = async <ItemType extends IContentItem>(
     const unordered = await client
       .items<ItemType>()
       .type(typeCodename)
+      .collections(publicCollections)
       .queryConfig(queryConfig)
       .toPromise();
 
@@ -460,34 +461,35 @@ const getItemsByType = async <ItemType extends IContentItem>(
   }
 };
 
-const loadHomepageNotices = async (
+const loadHomepageItems = async (
   config: ClientConfig,
   usePreview: boolean,
-): Promise<ReadonlyArray<FeaturedNotice>> => {
-  const [riskAlerts, regulatoryNotices] = await Promise.all([
-    getItemsByType<RiskAlert>(config, usePreview, complianceContentTypes.riskAlert),
-    getItemsByType<RegulatoryNotice>(config, usePreview, complianceContentTypes.regulatoryNotice),
-  ]);
+): Promise<ReadonlyArray<HomepageItem>> => {
+  const groupedByType = await Promise.all(
+    homepageTypeCodenames.map(async (typeCodename) =>
+      getItemsByType<HomepageItem>(config, usePreview, typeCodename),
+    ),
+  );
 
-  return [...riskAlerts, ...regulatoryNotices];
+  return groupedByType.flat();
 };
 
-export const getHomepageNotices = async (
+export const getHomepageItems = async (
   config: ClientConfig,
   usePreview: boolean,
-): Promise<ReadonlyArray<FeaturedNotice>> => {
-  const primary = await loadHomepageNotices(config, usePreview);
+): Promise<ReadonlyArray<HomepageItem>> => {
+  const primary = await loadHomepageItems(config, usePreview);
   if (primary.length > 0) {
     return primary;
   }
 
-  const previewItems = await loadHomepageNotices(config, true);
+  const previewItems = await loadHomepageItems(config, true);
   if (previewItems.length > 0) {
     return previewItems;
   }
 
   if (config.envId !== defaultEnvId) {
-    return loadHomepageNotices({ envId: defaultEnvId }, true);
+    return loadHomepageItems({ envId: defaultEnvId }, true);
   }
 
   return [];

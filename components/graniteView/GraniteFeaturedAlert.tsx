@@ -2,30 +2,41 @@ import { ArrowRightIcon, ExclamationTriangleIcon } from "@heroicons/react/24/sol
 import Link from "next/link";
 import type { FC } from "react";
 import {
-  complianceElements,
-  type FeaturedNotice,
-  isRiskAlert,
-} from "../../lib/types/compliance.ts";
+  type HomepageItem,
+  homepageElements,
+  isMarketUpdate,
+} from "../../lib/types/homepageContent.ts";
 import { formatShortDate } from "../../lib/utils/dateTime.ts";
+import {
+  getItemBadgeLabel,
+  getItemCallToAction,
+  getItemExtraTags,
+  getItemSummary,
+  isPriorityHomepageItem,
+} from "../../lib/utils/homepageContent.ts";
 import { createElementSmartLink, createItemSmartLink } from "../../lib/utils/smartLinkUtils.ts";
 import { RichTextElement } from "../shared/richText/RichTextElement.tsx";
 
 type Props = Readonly<{
-  item: FeaturedNotice;
+  item: HomepageItem;
 }>;
 
-const getTaxonomyLabels = (item: FeaturedNotice) =>
-  [
-    ...item.elements[complianceElements.documentClass].value,
-    ...item.elements[complianceElements.audience].value,
-  ].map((term) => term.name);
+const getTaxonomyLabels = (item: HomepageItem) => [
+  ...new Set([
+    ...item.elements[homepageElements.documentClass].value.map((term) => term.name),
+    ...item.elements[homepageElements.audience].value.map((term) => term.name),
+    ...getItemExtraTags(item),
+  ]),
+];
 
 export const GraniteFeaturedAlert: FC<Props> = ({ item }) => {
-  const isPriorityAlert = isRiskAlert(item);
-  const badgeLabel = isPriorityAlert ? "HIGH PRIORITY ALERT" : "REGULATORY NOTICE";
-  const effectiveDate = item.elements[complianceElements.effectiveDate].value;
+  const isPriorityAlert = isPriorityHomepageItem(item);
+  const badgeLabel = getItemBadgeLabel(item);
+  const effectiveDate = item.elements[homepageElements.effectiveDate].value;
+  const summary = getItemSummary(item);
+  const callToAction = getItemCallToAction(item);
   const tags = getTaxonomyLabels(item);
-  const isRestricted = item.elements[complianceElements.audience].value.some(
+  const isRestricted = item.elements[homepageElements.audience].value.some(
     (term) => term.codename === "institutional",
   );
 
@@ -36,7 +47,9 @@ export const GraniteFeaturedAlert: FC<Props> = ({ item }) => {
     >
       <div className="flex flex-col gap-4">
         <span className="inline-flex w-fit items-center gap-2 rounded-full bg-granite-cream px-3 py-1 text-[11px] font-semibold tracking-wide text-granite-navy uppercase">
-          <ExclamationTriangleIcon className="h-3.5 w-3.5 text-amber-600" />
+          {isPriorityAlert ? (
+            <ExclamationTriangleIcon className="h-3.5 w-3.5 text-amber-600" />
+          ) : null}
           {badgeLabel}
         </span>
         {effectiveDate ? (
@@ -44,7 +57,7 @@ export const GraniteFeaturedAlert: FC<Props> = ({ item }) => {
             Effective Date:{" "}
             <span
               className="font-semibold text-granite-navy"
-              {...createElementSmartLink(complianceElements.effectiveDate)}
+              {...createElementSmartLink(homepageElements.effectiveDate)}
             >
               {formatShortDate(effectiveDate)}
             </span>
@@ -64,24 +77,34 @@ export const GraniteFeaturedAlert: FC<Props> = ({ item }) => {
         ) : null}
       </div>
       <div>
-        <h2
+        <h3
           className="m-0 text-2xl font-bold text-granite-navy"
-          {...createElementSmartLink(complianceElements.title)}
+          {...createElementSmartLink(homepageElements.title)}
         >
           {item.elements.title.value}
-        </h2>
+        </h3>
+        {summary ? (
+          <p
+            className="mt-3 m-0 text-[15px] leading-7 font-medium text-granite-navy"
+            {...createElementSmartLink(
+              isMarketUpdate(item) ? homepageElements.marketingSummary : homepageElements.summary,
+            )}
+          >
+            {summary}
+          </p>
+        ) : null}
         <div
           className="mt-4 text-[15px] leading-7 text-granite-muted [&_p]:my-0"
-          {...createElementSmartLink(complianceElements.body)}
+          {...createElementSmartLink(homepageElements.body)}
         >
           <RichTextElement element={item.elements.body} isInsideTable={false} />
         </div>
         <div className="mt-8 flex flex-wrap items-center justify-between gap-3">
           <Link
             className="inline-flex items-center gap-2 text-sm font-semibold text-granite-navy no-underline hover:text-granite-gold"
-            href="#"
+            href={callToAction.href}
           >
-            Read Full Analysis
+            {callToAction.label}
             <ArrowRightIcon className="h-3.5 w-3.5" />
           </Link>
           {isRestricted ? (

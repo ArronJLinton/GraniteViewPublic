@@ -15,38 +15,56 @@
 
 export const collections = {
   /**
-   * Ficto Healthtech
+   * Marketing
    */
-  ficto_healthtech: {
-    codename: "ficto_healthtech",
-    id: "5eb3c621-9492-524e-a061-9ee80bbfc947",
-    name: "Ficto Healthtech",
+  marketing: {
+    codename: "marketing",
+    id: "",
+    name: "Marketing",
   },
 
   /**
-   * Ficto Imaging
+   * Client Advisory
    */
-  ficto_imaging: {
-    codename: "ficto_imaging",
-    id: "883baa53-543d-5557-bf4d-1dc7c59993e1",
-    name: "Ficto Imaging",
+  client_advisory: {
+    codename: "client_advisory",
+    id: "",
+    name: "Client Advisory",
   },
 
   /**
-   * Ficto Surgical
+   * Trading & Markets
    */
-  ficto_surgical: {
-    codename: "ficto_surgical",
-    id: "47ff7979-f3b7-5492-be72-e6f5a9e73d0f",
-    name: "Ficto Surgical",
+  trading___markets: {
+    codename: "trading___markets",
+    id: "",
+    name: "Trading & Markets",
   },
 
   /**
-   * Common
+   * Risk Management
+   */
+  risk_management: {
+    codename: "risk_management",
+    id: "",
+    name: "Risk Management",
+  },
+
+  /**
+   * Compliance
+   */
+  compliance: {
+    codename: "compliance",
+    id: "",
+    name: "Compliance",
+  },
+
+  /**
+   * Default
    */
   default: {
     codename: "default",
     id: "00000000-0000-0000-0000-000000000000",
-    name: "Common",
+    name: "Default",
   },
 } as const;

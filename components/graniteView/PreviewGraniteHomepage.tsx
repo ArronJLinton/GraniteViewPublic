@@ -3,21 +3,21 @@
 import type { IContentItem } from "@kontent-ai/delivery-sdk";
 import { applyUpdateOnItemAndLoadLinkedItems } from "@kontent-ai/smart-link";
 import { type FC, useState } from "react";
-import type { FeaturedNotice } from "../../lib/types/compliance.ts";
+import type { HomepageItem } from "../../lib/types/homepageContent.ts";
 import { useLivePreview } from "../../lib/useLivePreview.ts";
 import { parseFlatted, stringifyAsType } from "../../lib/utils/circularityUtils.ts";
 import GraniteHomepage from "./GraniteHomepage.tsx";
 
 type Props = Readonly<{
-  notices: ReadonlyArray<FeaturedNotice>;
+  items: ReadonlyArray<HomepageItem>;
 }>;
 
-const PreviewGraniteHomepage: FC<Props> = ({ notices }) => {
-  const [items, setItems] = useState(parseFlatted(stringifyAsType(notices)));
+const PreviewGraniteHomepage: FC<Props> = ({ items }) => {
+  const [previewItems, setPreviewItems] = useState(parseFlatted(stringifyAsType(items)));
 
   useLivePreview(async (data) => {
     const updatedItems = await Promise.all(
-      items.map(async (item) => {
+      previewItems.map(async (item) => {
         const updatedItem = await applyUpdateOnItemAndLoadLinkedItems(
           item,
           data,
@@ -28,14 +28,14 @@ const PreviewGraniteHomepage: FC<Props> = ({ notices }) => {
           },
         );
 
-        return updatedItem as unknown as FeaturedNotice;
+        return updatedItem as unknown as HomepageItem;
       }),
     );
 
-    setItems(updatedItems);
+    setPreviewItems(updatedItems);
   });
 
-  return <GraniteHomepage notices={items} />;
+  return <GraniteHomepage items={previewItems} />;
 };
 
 export default PreviewGraniteHomepage;
